@@ -19,6 +19,7 @@ paddle1_pos = [HALF_PAD_WIDTH, HEIGHT / 2]
 paddle2_pos = [WIDTH - HALF_PAD_WIDTH, HEIGHT / 2]
 paddle1_vel = 0
 paddle2_vel = 0
+acceleracio = 0.5
 ball_radius = 10
 ball_vel = [0, 0]
 right = True
@@ -62,13 +63,13 @@ def key_down():
     global paddle1_vel, paddle2_vel
     if event.type == KEYDOWN:
         if event.key == K_w:
-            paddle1_vel = -0.5
+            paddle1_vel = -acceleracio
         elif event.key == K_s:
-            paddle1_vel = 0.5
+            paddle1_vel = acceleracio
         elif event.key == K_UP:
-            paddle2_vel = -0.5
+            paddle2_vel = -acceleracio
         elif event.key == K_DOWN:
-            paddle2_vel = 0.5
+            paddle2_vel = acceleracio
 
 # aixecar tecla
 def key_up():
