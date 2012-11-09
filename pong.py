@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Implementation of classic arcade game Pong
 
 import pygame, sys
