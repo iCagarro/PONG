@@ -25,11 +25,13 @@ ball_vel = [0, 0]
 right = True
 score1 = 0
 score2 = 0
+mode = ''
 
 # imatges del fons, el paddle i la ball
 ball = 'ball.png'
 fons = 'fons.jpg'
 paddle = 'pad.jpg'
+##fons_init = 'fons_init.png'
 
 # pantalla
 screen = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
@@ -41,29 +43,40 @@ ball_im = pygame.image.load(ball)
 paddle_im = pygame.image.load(paddle).convert()
 # titol de la finestra
 pygame.display.set_caption('PONG')
+### fons_init
+##fons_init_im = pygame.image.load(fons_init)
 
-# rellotge1 (veure # rellotge2)
-s = [0, 0]
-    
 # FUNCIONS
+# inicial
+def init():
+    global paddle1_pos, paddle2_pos, paddle1_vel, paddle2_vel, score1, score2, ball_pos, ball_vel, mode
+    paddle1_pos = [HALF_PAD_WIDTH, HEIGHT / 2]
+    paddle2_pos = [WIDTH - HALF_PAD_WIDTH, HEIGHT / 2]
+    paddle1_vel = 0
+    paddle2_vel = 0
+    score1 = 0
+    score2 = 0
+    ball_pos = [WIDTH / 2, HEIGHT / 2]
+    ball_vel = [0, 0]
+
 # ball inicial
 def ball_init(right):
     global ball_pos, ball_vel
     ball_pos = [WIDTH / 2, HEIGHT / 2]
     if right == True:
         x = random.randrange(12, 24) * 0.015
-        y = random.randrange(-18, 18) * 0.015
-        ball_vel = [x, y]
+        y = random.randrange(5, 18) * 0.015
+        ball_vel = [x, -y]
         return ball_vel
     if right == False:
         x = random.randrange(12, 24) * 0.015
-        y = random.randrange(-18, 18) * 0.015
-        ball_vel = [-x, y]
+        y = random.randrange(5, 18) * 0.015
+        ball_vel = [-x, -y]
         return ball_pos, ball_vel
 
 # apretar tecla
 def key_down():
-    global paddle1_vel, paddle2_vel
+    global paddle1_vel, paddle2_vel, mode
     if event.type == KEYDOWN:
         if event.key == K_w:
             paddle1_vel = -acceleracio
@@ -73,6 +86,15 @@ def key_down():
             paddle2_vel = -acceleracio
         elif event.key == K_DOWN:
             paddle2_vel = acceleracio
+        # iniciar la parida
+        if event.key == K_1:
+            init()
+            mode = 'cpu'
+        elif event.key == K_2:
+            init()
+            mode = 'two'
+        if event.key == K_SPACE and (mode == 'cpu' or mode == 'two') and ball_vel == [0, 0]:
+            ball_init(right)        
 
 # aixecar tecla
 def key_up():
@@ -116,8 +138,19 @@ def update_ball():
 # moviment paddle
 def update_paddle():
     global paddle1_pos, paddle1_vel, paddle2_pos, paddle2_vel
-    paddle1_pos[1] += paddle1_vel
     paddle2_pos[1] += paddle2_vel
+    # mode two players
+    if mode == 'two':
+        paddle1_pos[1] += paddle1_vel
+    # mode cpu
+    if mode == 'cpu':
+        n = ball_pos[1] - paddle1_pos[1]
+        if ball_vel[0] < 0:
+            paddle1_pos[1] += 0
+        if n >= 0 and ball_vel[0] < 0:
+            paddle1_pos[1] += acceleracio
+        elif n <= 0 and ball_vel[0] < 0:
+            paddle1_pos[1] += -acceleracio
 
 # parets
 def walls():
@@ -150,7 +183,7 @@ def goal():
         score2 += 1
 
 # iniciem el programa
-ball_init(right)
+init()
 
 # LOOP PRINCIPAL
 while True:
@@ -181,7 +214,7 @@ while True:
     # teclat
     key_handle()
 
-    # dibuixar fons
+    # dibuixem el fons
     screen.blit(background, (0, 0))
     # dibuixar paddles
     screen.blit(paddle_im, (paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT))
@@ -189,10 +222,7 @@ while True:
     # dibuixar ball
     screen.blit(ball_im, (ball_pos[0] - ball_radius, ball_pos[1] - ball_radius))
 
-    # rellotge2
-    clock = pygame.time.get_ticks()
-    s.append(clock // 1)
-    if len(s) > 2:
-        s.pop(0)
-    if s[0] < s[1]:
-        pygame.display.update()
+    clock = pygame.time.Clock()
+    clock.tick(1000)
+    
+    pygame.display.update()
