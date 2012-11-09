@@ -41,6 +41,9 @@ ball_im = pygame.image.load(ball)
 paddle_im = pygame.image.load(paddle).convert()
 # titol de la finestra
 pygame.display.set_caption('PONG')
+
+# rellotge1 (veure # rellotge2)
+s = [0, 0]
     
 # FUNCIONS
 # ball inicial
@@ -136,7 +139,6 @@ def ball_vs_pads():
         else:
             ball_vel[0] = -abs(ball_vel[0] + ball_vel[0] * 0.1) 
 
-
 # gol
 def goal():
     global score1, score2
@@ -152,7 +154,6 @@ ball_init(right)
 
 # LOOP PRINCIPAL
 while True:
-
     # apagar
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -188,8 +189,10 @@ while True:
     # dibuixar ball
     screen.blit(ball_im, (ball_pos[0] - ball_radius, ball_pos[1] - ball_radius))
 
-    # rellotge
-    temps = pygame.time.delay(1)        
-        
-    pygame.display.update()
-
+    # rellotge2
+    clock = pygame.time.get_ticks()
+    s.append(clock // 1)
+    if len(s) > 2:
+        s.pop(0)
+    if s[0] < s[1]:
+        pygame.display.update()
