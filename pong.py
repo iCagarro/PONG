@@ -34,6 +34,9 @@ fons = 'fons.jpg'
 paddle = 'pad.jpg'
 ##fons_init = 'fons_init.png'
 
+# seleccionat el tipus de lletra escriure
+font = pygame.font.SysFont("Arial", 20)
+
 # pantalla
 screen = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 # fons
@@ -227,6 +230,14 @@ while True:
     screen.blit(paddle_im, (paddle2_pos[0] - HALF_PAD_WIDTH + 1, paddle2_pos[1] - HALF_PAD_HEIGHT))
     # dibuixar ball
     screen.blit(ball_im, (ball_pos[0] - ball_radius, ball_pos[1] - ball_radius))
+
+    #dibuixar cartells
+    text = font.render("1. Mode CPU", 1, (0,0,0))
+    screen.blit(text, (50, 50))
+    text = font.render("2. Mode dos jugadors", 1, (0,0,0))
+    screen.blit(text, (50, 70))
+    text = font.render("ESPAI per començar", 1, (0,0,0))
+    screen.blit(text, (50, 90))
 
     clock = pygame.time.Clock()
     clock.tick(1000)
