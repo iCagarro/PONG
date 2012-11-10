@@ -87,7 +87,7 @@ def key_down():
             paddle2_vel = -acceleracio
         elif event.key == K_DOWN:
             paddle2_vel = acceleracio
-        # iniciar la parida
+        # iniciar la partida
         if event.key == K_1:
             init()
             mode = 'cpu'
@@ -96,6 +96,9 @@ def key_down():
             mode = 'two'
         if event.key == K_SPACE and (mode == 'cpu' or mode == 'two') and ball_vel == [0, 0]:
             ball_init(right)        
+        if event.key == K_ESCAPE:
+            quit()
+            
 
 # aixecar tecla
 def key_up():
@@ -183,6 +186,9 @@ def goal():
         ball_init(False)
         score2 += 1
 
+def quit():
+    pygame.quit()
+    sys.exit()
 # iniciem el programa
 init()
 
@@ -191,8 +197,7 @@ while True:
     # apagar
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+            quit()
  
     # posicio de la ball (t)
     update_ball()
