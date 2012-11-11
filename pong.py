@@ -20,19 +20,19 @@ paddle1_pos = [HALF_PAD_WIDTH, HEIGHT / 2]
 paddle2_pos = [WIDTH - HALF_PAD_WIDTH, HEIGHT / 2]
 paddle1_vel = 0
 paddle2_vel = 0
-acceleracio = 0.5
+acceleracio = 0.01
 ball_radius = 10
 ball_vel = [0, 0]
 right = True
 score1 = 0
 score2 = 0
 mode = ''
+t = 0
 
 # imatges del fons, el paddle i la ball
 ball = 'ball.png'
 fons = 'fons.jpg'
 paddle = 'pad.jpg'
-##fons_init = 'fons_init.png'
 
 # seleccionat el tipus de lletra escriure
 font = pygame.font.SysFont("Arial", 20)
@@ -47,8 +47,6 @@ ball_im = pygame.image.load(ball)
 paddle_im = pygame.image.load(paddle).convert()
 # titol de la finestra
 pygame.display.set_caption('PONG')
-### fons_init
-##fons_init_im = pygame.image.load(fons_init)
 
 # FUNCIONS
 # inicial
@@ -83,13 +81,13 @@ def key_down():
     global paddle1_vel, paddle2_vel, mode
     if event.type == KEYDOWN:
         if event.key == K_w:
-            paddle1_vel = -acceleracio
+            paddle1_vel = -0.5
         elif event.key == K_s:
-            paddle1_vel = acceleracio
+            paddle1_vel = 0.5
         elif event.key == K_UP:
-            paddle2_vel = -acceleracio
+            paddle2_vel = -0.5
         elif event.key == K_DOWN:
-            paddle2_vel = acceleracio
+            paddle2_vel = 0.5
         # iniciar la partida
         if event.key == K_1:
             init()
@@ -102,7 +100,6 @@ def key_down():
         if event.key == K_ESCAPE:
             quit()
             
-
 # aixecar tecla
 def key_up():
     global paddle1_vel, paddle2_vel
@@ -139,25 +136,25 @@ def paddle_limits():
 # moviment ball
 def update_ball():
     global ball_pos, ball_vel
-    ball_pos[0] += ball_vel[0]
-    ball_pos[1] += ball_vel[1]
+    ball_pos[0] += ball_vel[0] * t
+    ball_pos[1] += ball_vel[1] * t
 
 # moviment paddle
 def update_paddle():
     global paddle1_pos, paddle1_vel, paddle2_pos, paddle2_vel
-    paddle2_pos[1] += paddle2_vel
+    paddle2_pos[1] += paddle2_vel * t
     # mode two players
     if mode == 'two':
-        paddle1_pos[1] += paddle1_vel
+        paddle1_pos[1] += paddle1_vel * t
     # mode cpu
     if mode == 'cpu':
         n = ball_pos[1] - paddle1_pos[1]
         if ball_vel[0] < 0:
-            paddle1_pos[1] += 0
+            paddle1_pos[1] += 0 * t
         if n >= 0 and ball_vel[0] < 0:
-            paddle1_pos[1] += acceleracio
+            paddle1_pos[1] += 0.5 * t
         elif n <= 0 and ball_vel[0] < 0:
-            paddle1_pos[1] += -acceleracio
+            paddle1_pos[1] += -0.5 * t
 
 # parets
 def walls():
@@ -189,14 +186,36 @@ def goal():
         ball_init(False)
         score2 += 1
 
+# render
+def render():
+    # dibuixem el fons
+    screen.blit(background, (0, 0))
+    # dibuixar paddles
+    screen.blit(paddle_im, (paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT))
+    screen.blit(paddle_im, (paddle2_pos[0] - HALF_PAD_WIDTH + 1, paddle2_pos[1] - HALF_PAD_HEIGHT))
+    # dibuixar ball
+    screen.blit(ball_im, (ball_pos[0] - ball_radius, ball_pos[1] - ball_radius))
+
+    #dibuixar cartells
+    text = font.render("1. Mode CPU", 1, (0,0,0))
+    screen.blit(text, (50, 50))
+    text = font.render("2. Mode dos jugadors", 1, (0,0,0))
+    screen.blit(text, (50, 70))
+    text = font.render("ESPAI per comencar", 1, (0,0,0))
+    screen.blit(text, (50, 90))
+
 def quit():
     pygame.quit()
     sys.exit()
+
 # iniciem el programa
 init()
 
 # LOOP PRINCIPAL
 while True:
+    # rellotge: agafem el temps del principi
+    t1 = pygame.time.get_ticks()
+
     # apagar
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -223,23 +242,11 @@ while True:
     # teclat
     key_handle()
 
-    # dibuixem el fons
-    screen.blit(background, (0, 0))
-    # dibuixar paddles
-    screen.blit(paddle_im, (paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT))
-    screen.blit(paddle_im, (paddle2_pos[0] - HALF_PAD_WIDTH + 1, paddle2_pos[1] - HALF_PAD_HEIGHT))
-    # dibuixar ball
-    screen.blit(ball_im, (ball_pos[0] - ball_radius, ball_pos[1] - ball_radius))
+    # render
+    render()
 
-    #dibuixar cartells
-    text = font.render("1. Mode CPU", 1, (0,0,0))
-    screen.blit(text, (50, 50))
-    text = font.render("2. Mode dos jugadors", 1, (0,0,0))
-    screen.blit(text, (50, 70))
-    text = font.render("ESPAI per començar", 1, (0,0,0))
-    screen.blit(text, (50, 90))
-
-    clock = pygame.time.Clock()
-    clock.tick(1000)
+    # rellotge: agafem el temps del final i definim la variable t
+    t2 = pygame.time.get_ticks()
+    t = t2 - t1
     
     pygame.display.update()
